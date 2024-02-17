@@ -15,18 +15,21 @@ def extract_urls_from_sitemap(sitemap_url):
         urls.append(loc.text)
     return urls
 
-@app.route('/extract-sitemap', methods=['POST'])
+@app.route('/extract-sitemap', methods=['GET', 'POST'])
 def extract_sitemap():
-    sitemap_url = request.json.get('url')
+    if request.method == 'POST':
+        sitemap_url = request.json.get('url')
 
-    if not sitemap_url:
-        return jsonify({'error': 'No sitemap URL provided'}), 400
+        if not sitemap_url:
+            return jsonify({'error': 'No sitemap URL provided'}), 400
 
-    try:
-        urls = extract_urls_from_sitemap(sitemap_url)
-        return jsonify({'urls': urls}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        try:
+            urls = extract_urls_from_sitemap(sitemap_url)
+            return jsonify({'urls': urls}), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    else:
+        return jsonify({'error': 'Method not allowed'}), 405
 
 if __name__ == '__main__':
     app.run(debug=True)
